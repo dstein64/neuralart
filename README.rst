@@ -1,7 +1,7 @@
 A library and command line utility for rendering generative art from a randomly
 initialized neural network.
 
-Based on the following blog posts and pages on `studio otoro <http://otoro.net/>`__
+Based on the following blog posts and pages from `studio otoro <http://otoro.net/>`__
 
 - `Neural Network Generative Art in Javascript <http://blog.otoro.net/2015/06/19/neural-network-generative-art/>`__
 - `Generating Abstract Patterns with TensorFlow <http://blog.otoro.net/2016/03/25/generating-abstract-patterns-with-tensorflow/>`__
