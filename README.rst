@@ -44,6 +44,19 @@ flag for more information.
 
     $ neuralart --help
 
+Example
+~~~~~~~
+
+::
+
+    $ neuralart \
+          --seed 2 \
+          --xres 2048 \
+          --hidden-std 1.2 \
+          example.png
+
+.. image:: example.png
+
 Library Example Usage
 ---------------------
 
