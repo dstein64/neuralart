@@ -55,7 +55,9 @@ Example
           --hidden-std 1.2 \
           example.png
 
-.. image:: example.png
+.. image:: https://github.com/dstein64/neuralart/blob/master/example.png
+   :height: 400px
+   :width: 400px
 
 Library Example Usage
 ---------------------
