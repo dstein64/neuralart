@@ -5,8 +5,8 @@ Inspired by the following blog posts and pages on `otoro.net <http://otoro.net/>
 
 - `Neural Network Generative Art in Javascript <http://blog.otoro.net/2015/06/19/neural-network-generative-art/>`__
 - `Generating Abstract Patterns with TensorFlow <http://blog.otoro.net/2016/03/25/generating-abstract-patterns-with-tensorflow/>`__
-- `Neurogram <http://blog.otoro.net/2015/07/31/neurogram/`__
-- `Interactive Neural Network Art <http://otoro.net/ml/netart/`__
+- `Neurogram <http://blog.otoro.net/2015/07/31/neurogram/>`__
+- `Interactive Neural Network Art <http://otoro.net/ml/netart/>`__
 
 Requirements
 ------------
