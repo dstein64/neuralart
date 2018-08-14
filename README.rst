@@ -56,8 +56,7 @@ Example
           example.png
 
 .. image:: https://github.com/dstein64/neuralart/blob/master/example.png?raw=true
-   :height: 400px
-   :width: 400px
+   :scale: 20
 
 Library Example Usage
 ---------------------
