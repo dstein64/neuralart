@@ -55,6 +55,7 @@ Example
           --hidden-std 1.2 \
           example.png
 
+
 .. image:: https://github.com/dstein64/neuralart/blob/master/example-400.png?raw=true
    :target: https://github.com/dstein64/neuralart/blob/master/example.png
 
