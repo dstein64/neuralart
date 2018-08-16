@@ -17,7 +17,7 @@ with open(version_txt, 'r') as f:
 # ************************************************************
 
 def render(seed=None,
-           xlim=[-1, 1],
+           xlim=[-1.0, 1.0],
            ylim=None,
            xres=1024,
            yres=None,
@@ -90,10 +90,22 @@ def _parse_args(argv):
                         action="version",
                         version="neuralart {}".format(__version__))
     parser.add_argument("--seed", type=int, help="RNG seed.")
-    parser.add_argument("--xlim", type=int, nargs=2, help="X limits.", default=[-1, 1])
-    parser.add_argument("--ylim", type=int, nargs=2, help="Y limits.")
+    parser.add_argument("--xlim",
+                        type=float,
+                        nargs=2,
+                        help="X limits.",
+                        metavar=('MIN', 'MAX'),
+                        default=[-1.0, 1.0])
+    parser.add_argument("--ylim",
+                        type=float,
+                        nargs=2,
+                        metavar=('MIN', 'MAX'),
+                        help="Y limits. Defaults to xlim when not specified.")
     parser.add_argument("--xres", type=int, help="X resolution.", default=1024)
-    parser.add_argument("--yres", type=int, help="Y resolution.")
+    parser.add_argument("--yres",
+                        type=int,
+                        help="Y resolution. When not specified, the value is calculated"
+                             " automatically based on xlim, ylim, and xres.")
     parser.add_argument("--units", type=int, help="Units per hidden layer.", default=16)
     parser.add_argument("--depth", type=int, help="Number of hidden layers.",default=8)
     parser.add_argument("--hidden-std",
@@ -117,21 +129,27 @@ def _parse_args(argv):
                         help="Disables bias terms.",
                         dest="bias")
     parser.add_argument("--z", type=float, nargs="*")
-    parser.add_argument("output", help="File path to save the PNG image.")
+    parser.add_argument("--no-verbose", action='store_false', dest='verbose')
+    parser.add_argument("file", help="File path to save the PNG image.")
     args = parser.parse_args(argv[1:])
     return args
 
 
 def main(argv=sys.argv):
     args = _parse_args(argv)
-    if not args.output.lower().endswith(".png"):
+    if not args.file.lower().endswith(".png"):
         sys.stderr.write("Image file is missing PNG extension.\n")
     channels_lookup = {
         'rgb': 3,
         'bw': 1
     }
+    seed = args.seed
+    if seed is None:
+        seed = np.random.randint(2 ** 32, dtype=np.uint32)
+    if args.verbose:
+        print("Seed: {}".format(seed))
     result = render(
-        seed=args.seed,
+        seed=seed,
         xlim=args.xlim,
         ylim=args.ylim,
         xres=args.xres,
@@ -145,7 +163,7 @@ def main(argv=sys.argv):
         bias=args.bias,
         z=args.z
     )
-    scipy.misc.imsave(args.output, result.squeeze(), format='png')
+    scipy.misc.imsave(args.file, result.squeeze(), format='png')
     return 0
 
 
