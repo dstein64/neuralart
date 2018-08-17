@@ -30,9 +30,9 @@ def render(seed=None,
            bias=True,
            z=None):
     if seed is None:
-        seed = np.random.randint(2 ** 32, dtype=np.uint32)
+        seed = np.random.RandomState().randint(2 ** 32, dtype=np.uint32)
 
-    np.random.seed(seed)
+    rng = np.random.RandomState(seed=seed)
 
     if not ylim:
         ylim = copy.copy(xlim)
@@ -50,7 +50,7 @@ def render(seed=None,
     if radius:
         inputs = np.hstack((inputs, np.linalg.norm(inputs, axis=1)[:, np.newaxis]))
 
-    if z:
+    if z is not None:
         inputs = np.hstack((inputs, np.matlib.repmat(z, inputs.shape[0], 1)))
 
     n_hidden_units = [units] * depth
@@ -60,14 +60,14 @@ def render(seed=None,
         if bias:
             activations = np.hstack(
                 (np.ones((activations.shape[0], 1)), activations))
-        hidden_layer_weights = np.random.normal(
+        hidden_layer_weights = rng.normal(
             scale=hidden_std, size=(activations.shape[1], units))
         activations = np.tanh(np.dot(activations, hidden_layer_weights))
 
     if bias:
         activations = np.hstack(
             (np.ones((activations.shape[0], 1)), activations))
-    output_layer_weights = np.random.normal(
+    output_layer_weights = rng.normal(
         scale=output_std, size=(activations.shape[1], channels))
 
     logits = np.dot(activations, output_layer_weights)
@@ -145,7 +145,7 @@ def main(argv=sys.argv):
     }
     seed = args.seed
     if seed is None:
-        seed = np.random.randint(2 ** 32, dtype=np.uint32)
+        seed = np.random.RandomState().randint(2 ** 32, dtype=np.uint32)
     if args.verbose:
         print("Seed: {}".format(seed))
     result = render(

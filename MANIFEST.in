@@ -1,3 +1,5 @@
 include README.rst
 include LICENSE
-include example.png
+include example.py
+include images/example.png
+include images/example-400.png

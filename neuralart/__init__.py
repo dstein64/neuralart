@@ -1,1 +1,1 @@
-from .neuralart import __version__
+from .neuralart import __version__, render
