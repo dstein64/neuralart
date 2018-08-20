@@ -3,9 +3,7 @@
 # Example usage of neuralart.py.
 
 # Images can be converted to video with ffmpeg.
-#   > ffmpeg -pattern_type glob -i "*.png" \
-#            -c:v huffyuv -c:a libmp3lame -b:a 320k \
-#            output.avi
+#   > ffmpeg -pattern_type glob -i "*.png" -c:v huffyuv output.avi
 
 from __future__ import print_function
 
