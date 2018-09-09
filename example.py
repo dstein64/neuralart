@@ -10,8 +10,7 @@ from __future__ import print_function
 import os
 import sys
 
-import numpy as np
-import scipy
+from PIL import Image
 
 import neuralart
 
@@ -30,7 +29,7 @@ if not os.path.exists(directory):
 
 zfill = len(str(ITERATIONS - 1))
 
-z = np.array([-1.0] * Z_DIMS)
+z = [-1.0] * Z_DIMS
 step_size = 2.0 / ITERATIONS
 for x in range(ITERATIONS):
     result = neuralart.render(
@@ -40,5 +39,6 @@ for x in range(ITERATIONS):
         z=z
     )
     file = os.path.join(directory, str(x).zfill(zfill) + ".png")
-    scipy.misc.imsave(file, result.squeeze(), format='png')
-    z = z + step_size
+    im = Image.fromarray(result.squeeze())
+    im.save(file, 'png')
+    z = [_z + step_size for _z in z]

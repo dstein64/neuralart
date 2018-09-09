@@ -20,9 +20,8 @@ Other operating systems may be compatible if the dependencies can be properly in
 Dependencies
 ~~~~~~~~~~~~
 
-- NumPy
-- SciPy
-- pillow
+- PyTorch
+- Pillow
 
 Installation
 ------------

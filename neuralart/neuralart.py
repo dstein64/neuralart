@@ -3,14 +3,23 @@ from __future__ import print_function
 import argparse
 import copy
 import os
+import random
 import sys
 
-import numpy as np
-import scipy.misc
+from PIL import Image
+import torch
 
 version_txt = os.path.join(os.path.dirname(__file__), 'version.txt')
 with open(version_txt, 'r') as f:
     __version__ = f.read().strip()
+
+def get_devices():
+    devices = ["cpu"]
+    if torch.cuda.torch.cuda.is_available() and torch.cuda.device_count() > 0:
+        devices.append("cuda")
+        for idx in range(torch.cuda.device_count()):
+            devices.append("cuda:{}".format(idx))
+    return tuple(devices)
 
 # ************************************************************
 # * Core
@@ -28,11 +37,22 @@ def render(seed=None,
            channels=3,
            radius=True,
            bias=True,
-           z=None):
-    if seed is None:
-        seed = np.random.RandomState().randint(2 ** 32, dtype=np.uint32)
+           z=None,
+           device='cpu'):
+    if device not in get_devices():
+        raise RuntimeError("Device {} not in available devices: {}".format(
+            device, ", ".join(get_devices())))
 
-    rng = np.random.RandomState(seed=seed)
+    cpu_rng_state = torch.get_rng_state()
+    cuda_rng_states = []
+    if torch.cuda.is_available():
+        cuda_rng_states = [torch.cuda.get_rng_state(idx) for idx in range(torch.cuda.device_count())]
+
+    if seed is None:
+        seed = random.randint(0, 2 ** 32 - 1)
+
+    torch.cuda.manual_seed_all(seed)
+    torch.manual_seed(seed)
 
     if not ylim:
         ylim = copy.copy(xlim)
@@ -41,41 +61,41 @@ def render(seed=None,
         yxscale = float(ylim[1] - ylim[0]) / (xlim[1] - xlim[0])
         yres = int(yxscale * xres)
 
-    x = np.linspace(xlim[0], xlim[1], xres)
-    y = np.linspace(ylim[0], ylim[1], yres)
-    grid = np.meshgrid(x, y)
+    x = torch.linspace(xlim[0], xlim[1], xres, device=device)
+    y = torch.linspace(ylim[0], ylim[1], yres, device=device)
+    grid = torch.meshgrid((x, y))
 
-    inputs = np.vstack((grid[0].flatten(), grid[1].flatten())).T
+    inputs = torch.cat((grid[0].flatten().unsqueeze(1), grid[1].flatten().unsqueeze(1)), -1)
 
     if radius:
-        inputs = np.hstack((inputs, np.linalg.norm(inputs, axis=1)[:, np.newaxis]))
+        inputs = torch.cat((inputs, torch.norm(inputs, 2, 1).unsqueeze(1)), -1)
 
     if z is not None:
-        inputs = np.hstack((inputs, np.matlib.repmat(z, inputs.shape[0], 1)))
+        zrep = torch.tensor(z, dtype=inputs.dtype, device=device).repeat((inputs.shape[0], 1))
+        inputs = torch.cat((inputs, zrep), -1)
 
     n_hidden_units = [units] * depth
 
     activations = inputs
     for units in n_hidden_units:
         if bias:
-            activations = np.hstack(
-                (np.ones((activations.shape[0], 1)), activations))
-        hidden_layer_weights = rng.normal(
-            scale=hidden_std, size=(activations.shape[1], units))
-        activations = np.tanh(np.dot(activations, hidden_layer_weights))
+            bias_array = torch.ones((activations.shape[0], 1), device=device)
+            activations = torch.cat((bias_array, activations), -1)
+        hidden_layer_weights = torch.randn((activations.shape[1], units), device=device) * hidden_std
+        activations = torch.tanh(torch.mm(activations, hidden_layer_weights))
 
     if bias:
-        activations = np.hstack(
-            (np.ones((activations.shape[0], 1)), activations))
-    output_layer_weights = rng.normal(
-        scale=output_std, size=(activations.shape[1], channels))
-
-    logits = np.dot(activations, output_layer_weights)
-    output = 1.0 / (1.0 + np.exp(-logits))
-
+        bias_array = torch.ones((activations.shape[0], 1), device=device)
+        activations = torch.cat((bias_array, activations), -1)
+    output_layer_weights = torch.randn((activations.shape[1], channels), device=device) * output_std
+    output = torch.sigmoid(torch.mm(activations, output_layer_weights))
     output = output.reshape((yres, xres, channels))
 
-    return output
+    torch.set_rng_state(cpu_rng_state)
+    for idx, cuda_rng_state in enumerate(cuda_rng_states):
+        torch.cuda.set_rng_state(cuda_rng_state, idx)
+
+    return (output.cpu() * 255).round().type(torch.uint8).numpy()
 
 # ************************************************************
 # * Command Line Interface
@@ -128,6 +148,7 @@ def _parse_args(argv):
                         action="store_false",
                         help="Disables bias terms.",
                         dest="bias")
+    parser.add_argument("--device", default="cpu", choices=get_devices())
     parser.add_argument("--z", type=float, nargs="*")
     parser.add_argument("--no-verbose", action='store_false', dest='verbose')
     parser.add_argument("file", help="File path to save the PNG image.")
@@ -145,7 +166,7 @@ def main(argv=sys.argv):
     }
     seed = args.seed
     if seed is None:
-        seed = np.random.RandomState().randint(2 ** 32, dtype=np.uint32)
+        seed = random.randint(0, 2 ** 32 - 1)
     if args.verbose:
         print("Seed: {}".format(seed))
     result = render(
@@ -163,7 +184,8 @@ def main(argv=sys.argv):
         bias=args.bias,
         z=args.z
     )
-    scipy.misc.imsave(args.file, result.squeeze(), format='png')
+    im = Image.fromarray(result.squeeze())
+    im.save(args.file, 'png')
     return 0
 
 

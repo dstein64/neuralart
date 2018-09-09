@@ -31,5 +31,5 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6'
     ],
-    install_requires=['numpy', 'scipy', 'pillow']
+    install_requires=['pillow', 'torch']
 )
