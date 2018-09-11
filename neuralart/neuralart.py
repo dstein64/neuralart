@@ -49,7 +49,7 @@ def render(seed=None,
         cuda_rng_states = [torch.cuda.get_rng_state(idx) for idx in range(torch.cuda.device_count())]
 
     if seed is None:
-        seed = random.randint(0, 2 ** 32 - 1)
+        seed = random.Random().randint(0, 2 ** 32 - 1)
 
     torch.cuda.manual_seed_all(seed)
     torch.manual_seed(seed)
