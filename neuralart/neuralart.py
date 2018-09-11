@@ -54,16 +54,16 @@ def render(seed=None,
     torch.cuda.manual_seed_all(seed)
     torch.manual_seed(seed)
 
-    if not ylim:
+    if ylim is None:
         ylim = copy.copy(xlim)
 
-    if not yres:
+    if yres is None:
         yxscale = float(ylim[1] - ylim[0]) / (xlim[1] - xlim[0])
         yres = int(yxscale * xres)
 
     x = torch.linspace(xlim[0], xlim[1], xres, device=device)
     y = torch.linspace(ylim[0], ylim[1], yres, device=device)
-    grid = torch.meshgrid((x, y))
+    grid = torch.meshgrid((y, x))
 
     inputs = torch.cat((grid[0].flatten().unsqueeze(1), grid[1].flatten().unsqueeze(1)), -1)
 
