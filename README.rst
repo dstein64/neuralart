@@ -11,7 +11,7 @@ Based on the following blog posts and pages from `studio otoro <http://otoro.net
 Requirements
 ------------
 
-*neuralart* supports Python 2.7 and Python 3.x.
+*neuralart* supports Python 3.x.
 
 Linux, Mac, and Windows are supported.
 
