@@ -1,3 +1,9 @@
+.. image:: https://github.com/dstein64/neuralart/workflows/build/badge.svg
+    :target: https://github.com/dstein64/neuralart/actions
+
+neuralart
+=========
+
 A library and command line utility for rendering generative art from a randomly
 initialized neural network.
 
