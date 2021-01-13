@@ -182,7 +182,8 @@ def main(argv=sys.argv):
         channels=channels_lookup[args.color_space],
         radius=args.radius,
         bias=args.bias,
-        z=args.z
+        z=args.z,
+        device=args.device
     )
     im = Image.fromarray(result.squeeze())
     im.save(args.file, 'png')
