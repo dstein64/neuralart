@@ -14,11 +14,11 @@ with open(version_txt, 'r') as f:
     __version__ = f.read().strip()
 
 def get_devices():
-    devices = ["cpu"]
+    devices = ['cpu']
     if torch.cuda.torch.cuda.is_available() and torch.cuda.device_count() > 0:
-        devices.append("cuda")
+        devices.append('cuda')
         for idx in range(torch.cuda.device_count()):
-            devices.append("cuda:{}".format(idx))
+            devices.append('cuda:{}'.format(idx))
     return tuple(devices)
 
 # ************************************************************
@@ -40,8 +40,8 @@ def render(seed=None,
            z=None,
            device='cpu'):
     if device not in get_devices():
-        raise RuntimeError("Device {} not in available devices: {}".format(
-            device, ", ".join(get_devices())))
+        raise RuntimeError('Device {} not in available devices: {}'.format(
+            device, ', '.join(get_devices())))
 
     cpu_rng_state = torch.get_rng_state()
     cuda_rng_states = []
@@ -103,63 +103,63 @@ def render(seed=None,
 
 def _parse_args(argv):
     parser = argparse.ArgumentParser(
-        prog="neuralart",
+        prog='neuralart',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument("--version",
-                        action="version",
-                        version="neuralart {}".format(__version__))
-    parser.add_argument("--seed", type=int, help="RNG seed.")
-    parser.add_argument("--xlim",
+    parser.add_argument('--version',
+                        action='version',
+                        version='neuralart {}'.format(__version__))
+    parser.add_argument('--seed', type=int, help='RNG seed.')
+    parser.add_argument('--xlim',
                         type=float,
                         nargs=2,
-                        help="X limits.",
+                        help='X limits.',
                         metavar=('MIN', 'MAX'),
                         default=[-1.0, 1.0])
-    parser.add_argument("--ylim",
+    parser.add_argument('--ylim',
                         type=float,
                         nargs=2,
                         metavar=('MIN', 'MAX'),
-                        help="Y limits. Defaults to xlim when not specified.")
-    parser.add_argument("--xres", type=int, help="X resolution.", default=1024)
-    parser.add_argument("--yres",
+                        help='Y limits. Defaults to xlim when not specified.')
+    parser.add_argument('--xres', type=int, help='X resolution.', default=1024)
+    parser.add_argument('--yres',
                         type=int,
-                        help="Y resolution. When not specified, the value is calculated"
-                             " automatically based on xlim, ylim, and xres.")
-    parser.add_argument("--units", type=int, help="Units per hidden layer.", default=16)
-    parser.add_argument("--depth", type=int, help="Number of hidden layers.",default=8)
-    parser.add_argument("--hidden-std",
+                        help='Y resolution. When not specified, the value is calculated'
+                             ' automatically based on xlim, ylim, and xres.')
+    parser.add_argument('--units', type=int, help='Units per hidden layer.', default=16)
+    parser.add_argument('--depth', type=int, help='Number of hidden layers.',default=8)
+    parser.add_argument('--hidden-std',
                         type=float,
-                        help="Standard deviation used to randomly initialize hidden layer weights.",
+                        help='Standard deviation used to randomly initialize hidden layer weights.',
                         default=1.0)
-    parser.add_argument("--output-std",
+    parser.add_argument('--output-std',
                         type=float,
-                        help="Standard deviation used to randomly initialize output layer weights.",
+                        help='Standard deviation used to randomly initialize output layer weights.',
                         default=1.0)
-    parser.add_argument("--color-space",
+    parser.add_argument('--color-space',
                         choices=('rgb', 'bw'),
-                        help="Select the color space (RGB or black-and-white).",
+                        help='Select the color space (RGB or black-and-white).',
                         default='rgb')
-    parser.add_argument("--no-radius",
-                        action="store_false",
-                        help="Disables radius input term.",
-                        dest="radius")
-    parser.add_argument("--no-bias",
-                        action="store_false",
-                        help="Disables bias terms.",
-                        dest="bias")
-    parser.add_argument("--device", default="cpu", choices=get_devices())
-    parser.add_argument("--z", type=float, nargs="*")
-    parser.add_argument("--no-verbose", action='store_false', dest='verbose')
-    parser.add_argument("file", help="File path to save the PNG image.")
+    parser.add_argument('--no-radius',
+                        action='store_false',
+                        help='Disables radius input term.',
+                        dest='radius')
+    parser.add_argument('--no-bias',
+                        action='store_false',
+                        help='Disables bias terms.',
+                        dest='bias')
+    parser.add_argument('--device', default='cpu', choices=get_devices())
+    parser.add_argument('--z', type=float, nargs='*')
+    parser.add_argument('--no-verbose', action='store_false', dest='verbose')
+    parser.add_argument('file', help='File path to save the PNG image.')
     args = parser.parse_args(argv[1:])
     return args
 
 
 def main(argv=sys.argv):
     args = _parse_args(argv)
-    if not args.file.lower().endswith(".png"):
-        sys.stderr.write("Image file is missing PNG extension.\n")
+    if not args.file.lower().endswith('.png'):
+        sys.stderr.write('Image file is missing PNG extension.\n')
     channels_lookup = {
         'rgb': 3,
         'bw': 1
@@ -168,7 +168,7 @@ def main(argv=sys.argv):
     if seed is None:
         seed = random.randint(0, 2 ** 32 - 1)
     if args.verbose:
-        print("Seed: {}".format(seed))
+        print('Seed: {}'.format(seed))
     result = render(
         seed=seed,
         xlim=args.xlim,
@@ -190,5 +190,5 @@ def main(argv=sys.argv):
     return 0
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main(sys.argv))
