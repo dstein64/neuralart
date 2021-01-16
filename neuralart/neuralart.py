@@ -5,6 +5,7 @@ import copy
 import os
 import random
 import sys
+import warnings
 
 from PIL import Image
 import torch
@@ -15,7 +16,13 @@ with open(version_txt, 'r') as f:
 
 def get_devices():
     devices = ['cpu']
-    if torch.cuda.torch.cuda.is_available() and torch.cuda.device_count() > 0:
+    # As of PyTorch 1.7.0, calling torch.cuda.is_available shows a warning ("...Found no NVIDIA
+    # driver on your system..."). A related issue is reported in PyTorch Issue #47038.
+    # Warnings are suppressed below to prevent a warning from showing when no GPU is available.
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cuda_available = torch.cuda.is_available()
+    if cuda_available and torch.cuda.device_count() > 0:
         devices.append('cuda')
         for idx in range(torch.cuda.device_count()):
             devices.append('cuda:{}'.format(idx))
