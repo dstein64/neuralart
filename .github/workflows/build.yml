@@ -48,12 +48,10 @@ jobs:
 
     - name: Install Torch (windows)
       if: matrix.os == 'windows-latest'
-      run: pip install torch==1.8.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      run: pip install torch==1.9.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
     - name: Install
-      run: |
-        pip install numpy
-        pip install .
+      run: pip install .
 
     - name: Test
       run: neuralart test-example.png
