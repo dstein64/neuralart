@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import argparse
 import copy
+import inspect
 import os
 import random
 import sys
@@ -70,7 +71,10 @@ def render(seed=None,
 
     x = torch.linspace(xlim[0], xlim[1], xres, device=device)
     y = torch.linspace(ylim[0], ylim[1], yres, device=device)
-    grid = torch.meshgrid((y, x))
+    meshgrid_kwargs = {}
+    if inspect.signature(torch.meshgrid).parameters.get('indexing'):
+        meshgrid_kwargs['indexing'] = 'ij'
+    grid = torch.meshgrid((y, x), **meshgrid_kwargs)
 
     inputs = torch.cat((grid[0].flatten().unsqueeze(1), grid[1].flatten().unsqueeze(1)), -1)
 
